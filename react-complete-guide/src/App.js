@@ -5,27 +5,28 @@ import Person from './Person/Person';
 class App extends Component {
   state = {
     persons: [
-      { name: 'Khushi', age: 21 },
-      { name: 'Lavanya', age: 13 }
+      { id: 1, name: 'Khushi', age: 21 },
+      { id: 2, name: 'Lavanya', age: 13 }
     ]
   }
 
-  switchNameHandeler = () => {
-    this.setState({
-      persons: [
-        { name: 'Khushi Srivastava', age: 21 },
-        { name: 'Lavanya Srivastava', age: 13 }
-      ]
-    })
+  deletePersonHandeler = (personIndex) => {
+    // const persons = this.state.persons.slice()
+    const persons = [...this.state.persons]
+    persons.splice(personIndex, 1)
+    this.setState({persons: persons});
   }
 
-  changeNameHandeler = (event) => {
-    this.setState({
-      persons: [
-        { name: 'Khushi', age: 21 },
-        { name: event.target.value, age: 13 }
-      ]
-    })
+  changeNameHandeler = (event, personId) => {
+        const personIndex = this.state.persons.findIndex(p => p.id === personId);
+        const persons = [...this.state.persons];
+        persons[personIndex].name = event.target.value;
+        this.setState({persons: persons})
+  }
+
+  togglePersonHandeler = () => {
+	const show = this.state.showPerson
+	this.setState({showPerson: !show})
   }
 
   render() {
@@ -36,12 +37,26 @@ class App extends Component {
       cursor: 'pointer'
     }
 
+    let person = null
+
+    if (this.state.showPerson) {
+        person = (
+            <div>
+                {this.state.persons.map((person, index) => <Person 
+                click={() => this.deletePersonHandeler(index)} 
+                name={person.name} 
+                age={person.age}
+                key={person.id} 
+                change={(event) => this.changeNameHandeler(event, person.id)} />)}
+            </div>
+        );
+    }
+
     return (
       <div className="App">
         <h1>Hi, This is a React App.</h1>
-        <button style={style} onClick={this.switchNameHandeler}>Switch Name</button>
-        <Person click={this.switchNameHandeler} name={this.state.persons[0].name} age={this.state.persons[0].age}/>
-        <Person change={this.changeNameHandeler} name={this.state.persons[1].name} age={this.state.persons[1].age}/>
+        <button style={style} onClick={this.togglePersonHandeler}>Toogle Name</button>
+        {person}
       </div>
     );
   }
