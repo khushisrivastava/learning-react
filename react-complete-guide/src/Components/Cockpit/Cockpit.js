@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import "./Cockpit.css";
@@ -18,6 +18,9 @@ const StyledButton = styled.button`
 `;
 
 const cockpit = (props) => {
+  const toogleBtnRef = useRef(null);
+  useEffect(() => toogleBtnRef.current.click(), []);
+  
   const classes = [];
   if (props.persons.length <= 2) classes.push("red");
   if (props.persons.length <= 1) classes.push("bold");
@@ -26,7 +29,7 @@ const cockpit = (props) => {
     <div>
       <h1>Hi, This is a React App.</h1>
       <p className={classes.join(" ")}>This is working!</p>
-      <StyledButton alt={props.showPerson} onClick={props.clicked}>
+      <StyledButton ref={toogleBtnRef} alt={props.showPerson} onClick={props.clicked}>
         Toogle Name
       </StyledButton>
     </div>
