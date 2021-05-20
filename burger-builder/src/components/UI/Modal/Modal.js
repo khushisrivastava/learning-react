@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, memo } from "react";
 import classes from "./Modal.module.css";
 import Backdrop from "../Backdrop/Backdrop";
 
@@ -17,4 +17,4 @@ const modal = (props) => (
   </Fragment>
 );
 
-export default modal;
+export default memo(modal);
