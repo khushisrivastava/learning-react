@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import {connect} from "react-redux"
+import { connect } from "react-redux";
 import classes from "./ContactData.module.css";
 import Button from "../../../components/UI/Button/Button";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
 import axios from "../../../axios-order";
+import withErrorHandeler from "../../withErrorHandler/withErrorHandler";
+import * as actions from "../../../store/actions/index";
 
 class ContactData extends Component {
   state = {
@@ -87,16 +89,14 @@ class ContactData extends Component {
         },
         validation: {},
         valid: true,
-        value: "",
+        value: "fastest",
       },
     },
-    loading: false,
     formIsValid: false,
   };
 
   orderHandeler = (event) => {
     event.preventDefault();
-    this.setState({ loading: true });
 
     const formData = {};
     for (let elem in this.state.orderForm) {
@@ -109,13 +109,7 @@ class ContactData extends Component {
       orderData: formData,
     };
 
-    axios
-      .post("/order.json", order)
-      .then(() => {
-        this.setState({ loading: false });
-        this.props.history.push("/");
-      })
-      .catch(() => this.setState({ loading: false }));
+    this.props.onOrderBurger(order);
   };
 
   checkValidity(value, rule) {
@@ -183,7 +177,7 @@ class ContactData extends Component {
       </form>
     );
 
-    if (this.state.loading) {
+    if (this.props.loading) {
       form = <Spinner />;
     }
 
@@ -197,8 +191,16 @@ class ContactData extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  ings: state.ingredient,
-  price: state.price,
+  ings: state.burgerBuilder.ingredient,
+  price: state.burgerBuilder.price,
+  loading: state.order.loading
 });
 
-export default connect(mapStateToProps)(withRouter(ContactData));
+const mapDispatchToProps = (dispatch) => ({
+  onOrderBurger: (order) => dispatch(actions.purchaseBurger(order)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withErrorHandeler(withRouter(ContactData), axios));
