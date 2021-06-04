@@ -30,3 +30,7 @@ export const initIngredients = () => (dispatch) => {
       dispatch(fetchIngredientsFailed());
     });
 };
+
+export const resetBurgerBuilding = () => ({
+  type: actionTypes.RESET_BURGER_BUILDING,
+});

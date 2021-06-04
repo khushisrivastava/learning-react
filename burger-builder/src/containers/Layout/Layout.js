@@ -1,4 +1,5 @@
 import React, { Fragment, Component } from "react";
+import { connect } from "react-redux";
 import classes from "./Layout.module.css";
 import Toolbar from "../../components/Navigation/Toolbar/Toolbar";
 import SideDrawer from "../../components/Navigation/SideDrawer/SideDrawer";
@@ -18,8 +19,12 @@ class Layout extends Component {
   render() {
     return (
       <Fragment>
-        <Toolbar drawerOpened={this.sideDrawerToggleHandeler} />
+        <Toolbar
+          isAuth={this.props.isAuthenticated}
+          drawerOpened={this.sideDrawerToggleHandeler}
+        />
         <SideDrawer
+          isAuth={this.props.isAuthenticated}
           open={this.state.showSideDrawer}
           closed={this.sideDrawerClosedHandeler}
         />
@@ -29,4 +34,8 @@ class Layout extends Component {
   }
 }
 
-export default Layout;
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.token !== null,
+});
+
+export default connect(mapStateToProps)(Layout);

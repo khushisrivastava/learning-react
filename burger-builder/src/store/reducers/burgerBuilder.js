@@ -4,6 +4,7 @@ const initialState = {
   ingredient: null,
   price: 4,
   error: false,
+  building: false,
 };
 
 const INGREDIENT_PRICE = {
@@ -23,6 +24,7 @@ const reducer = (state = initialState, action) => {
           [action.ingredientName]: state.ingredient[action.ingredientName] + 1,
         },
         price: state.price + INGREDIENT_PRICE[action.ingredientName],
+        building: true,
       };
     case actionTypes.REMOVE_INGREDIENT:
       return {
@@ -32,18 +34,25 @@ const reducer = (state = initialState, action) => {
           [action.ingredientName]: state.ingredient[action.ingredientName] - 1,
         },
         price: state.price - INGREDIENT_PRICE[action.ingredientName],
+        building: true,
       };
     case actionTypes.SET_INGREDIENTS:
       return {
         ...state,
         ingredient: action.ingredients,
         error: false,
-        price: 4
+        price: 4,
+        building: false,
       };
     case actionTypes.FETCH_INGREDIENTS_FAILED:
       return {
         ...state,
         error: true,
+      };
+    case actionTypes.RESET_BURGER_BUILDING:
+      return {
+        ...state,
+        building: false,
       };
     default:
       return state;
