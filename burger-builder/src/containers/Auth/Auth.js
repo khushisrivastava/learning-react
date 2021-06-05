@@ -84,7 +84,7 @@ class Auth extends Component {
       this.state.controls.password.value,
       this.state.isSignUp
     );
-    if (this.props.isBuild) {
+    if (this.props.isBuild && this.props.isAuthenticated) {
       this.props.history.push("/checkout");
     }
   };
