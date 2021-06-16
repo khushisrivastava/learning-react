@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { connect } from "react-redux";
 import * as actions from "../../store/actions/index";
 import Burger from "../../components/Burger/Burger";
@@ -9,86 +9,76 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import axios from "../../axios-order";
 import withErrorHandler from "../withErrorHandler/withErrorHandler";
 
-class BurgerBuilder extends Component {
-  state = {
-    purchasing: false,
-  };
+function BurgerBuilder(props) {
+  const [purchasing, setPurchasing] = useState(false);
+  const { onInitIngredients } = props;
 
-  componentDidMount() {
-    if (!this.props.isBuild) {
-      this.props.onInitIngredients();
+  useEffect(() => {
+    if (!props.isBuild) {
+      onInitIngredients();
     }
-  }
+  }, [onInitIngredients]);
 
-  purchaseHandeler = () => {
-    if (this.props.isAuthenticated) {
-      this.setState({ purchasing: true });
+  const purchaseHandeler = () => {
+    if (props.isAuthenticated) {
+      setPurchasing(true);
     } else {
-      this.props.history.push("/auth");
+      props.history.push("/auth");
     }
   };
 
-  purchaseCancelHandeler = () => this.setState({ purchasing: false });
+  const purchaseCancelHandeler = () => setPurchasing(false);
 
-  purchaseContinueHandeler = () => {
-    this.props.OnInitPurchase();
-    this.props.history.push("/checkout");
+  const purchaseContinueHandeler = () => {
+    props.OnInitPurchase();
+    props.history.push("/checkout");
   };
 
-  updatePurchasable = (ingredient) => {
+  const updatePurchasable = (ingredient) => {
     const sum = Object.values(ingredient).reduce((a, b) => a + b, 0);
     return sum > 0;
   };
 
-  render() {
-    const disableInfo = { ...this.props.ings };
-    for (let key in disableInfo) {
-      disableInfo[key] = disableInfo[key] <= 0;
-    }
-    let orderSummary = null;
-    let burger = this.props.error ? (
-      <p>Ingredients can't be loaded!</p>
-    ) : (
-      <Spinner />
-    );
+  const disableInfo = { ...props.ings };
+  for (let key in disableInfo) {
+    disableInfo[key] = disableInfo[key] <= 0;
+  }
+  let orderSummary = null;
+  let burger = props.error ? <p>Ingredients can't be loaded!</p> : <Spinner />;
 
-    if (this.props.ings) {
-      burger = (
-        <Fragment>
-          <Burger ingredients={this.props.ings} />
-          <BuildControls
-            price={this.props.price}
-            add={this.props.onIngredientAdded}
-            remove={this.props.onIngredientRemoved}
-            disabled={disableInfo}
-            purchasable={!this.updatePurchasable(this.props.ings)}
-            purchase={this.purchaseHandeler}
-            isAuth={this.props.isAuthenticated}
-          />
-        </Fragment>
-      );
-      orderSummary = (
-        <OrderSummary
-          cancel={this.purchaseCancelHandeler}
-          continue={this.purchaseContinueHandeler}
-          ingredients={this.props.ings}
-          price={this.props.price}
-        />
-      );
-    }
-
-    return (
+  if (props.ings) {
+    burger = (
       <Fragment>
-        <Modal
-          show={this.state.purchasing}
-          modalClosed={this.purchaseCancelHandler}
-        >
-          {orderSummary}
-        </Modal>
-        {burger}
+        <Burger ingredients={props.ings} />
+        <BuildControls
+          price={props.price}
+          add={props.onIngredientAdded}
+          remove={props.onIngredientRemoved}
+          disabled={disableInfo}
+          purchasable={!updatePurchasable(props.ings)}
+          purchase={purchaseHandeler}
+          isAuth={props.isAuthenticated}
+        />
       </Fragment>
     );
+    orderSummary = (
+      <OrderSummary
+        cancel={purchaseCancelHandeler}
+        continue={purchaseContinueHandeler}
+        ingredients={props.ings}
+        price={props.price}
+      />
+    );
   }
+
+  return (
+    <Fragment>
+      <Modal show={purchasing} modalClosed={purchaseCancelHandeler}>
+        {orderSummary}
+      </Modal>
+      {burger}
+    </Fragment>
+  );
 }
 
 const mapStateToProps = (state) => ({
